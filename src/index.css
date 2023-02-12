@@ -1,0 +1,22 @@
+*{
+  margin: 0;
+  padding: o;
+  box-sizing: border-box;
+}
+
+body, html{
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background-color: #1b1d22;
+}
+
+canvas {
+  background-image: url('https://scx2.b-cdn.net/gfx/news/2019/galaxy.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  position: absolute;
+  top:30%;
+  /* background-color: black; */
+}
+
