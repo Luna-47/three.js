@@ -132,7 +132,7 @@ function onClick(event) {
       }
       else {
         selected = false;
-        selectedObject = null;
+        selectedObject = camera;
         message.innerHTML = "";
         message.style.opacity=0;
         document.removeEventListener("keydown", onDocumentKeyDown);
@@ -175,6 +175,8 @@ function onClick(event) {
         selectedObject.rotation.y -=0.01
       }else if (keyCode == 67){
         selectedObject.rotation.z -=0.01
+      }else if (keyCode == 46){
+        scene.remove(selectedObject)
       }
     }
   }
@@ -237,7 +239,7 @@ document.body.appendChild( addCubeButton );
 
 addCubeButton.addEventListener( 'click', function () {
     var cube = new THREE.Mesh( geometry, material );
-    cube.position.x = -50;
+    cube.position.x = 0;
     cube.position.y = 20;
     scene.add( cube );
     objects.push( cube );
@@ -253,7 +255,7 @@ document.body.appendChild( addSphereButton );
 
 addSphereButton.addEventListener( 'click', function () {
     var sphere = new THREE.Mesh( geometry1, material );
-    sphere.position.x = 50;
+    sphere.position.x = 0;
     sphere.position.y = 5;
     scene.add( sphere );
     objects.push( sphere );
