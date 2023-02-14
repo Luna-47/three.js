@@ -93,7 +93,7 @@ scene.add( ambientLight );
   var material = new THREE.MeshStandardMaterial( { map:boxTexture } );
   var object = new THREE.Mesh( geometry, material );
   var rand = Math.floor(Math.random()*100);
-  console.log(rand)
+  // console.log(rand)
   object.position.x = 0;
   object.position.y = 20;
   object.position.z = 0;
@@ -148,11 +148,17 @@ function onClick(event) {
         selectedObject.position.x += 1;
         message.innerHTML= 'right'
       } else if (keyCode == 38) {
-        selectedObject.position.z -= 1;
-        message.innerHTML= 'backward'
+        selectedObject.position.y += 1;
+        message.innerHTML= 'up'
       } else if (keyCode == 40) {
-        selectedObject.position.z += 1;
-        message.innerHTML= 'forward'
+        selectedObject.position.y -= 1;
+        message.innerHTML= 'down'
+       } else if (keyCode == 13) {
+          selectedObject.position.z -= 1;
+          message.innerHTML= 'backward'
+        } else if (keyCode == 16) {
+          selectedObject.position.z += 1;
+          message.innerHTML= 'forward'
       } else if (keyCode == 107) {
         selectedObject.scale.x +=0.01
         selectedObject.scale.y +=0.01
@@ -181,6 +187,11 @@ function onClick(event) {
     }
   }
 }
+
+//photoFrame
+const photo = new THREE.TextureLoader().load('https://yaffa-cdn.s3.amazonaws.com/yaffadsp/images/dmImage/StandardImage/p3-hd.jpg');
+const materialsPhoto = new THREE.MeshStandardMaterial({map: photo, side: THREE.DoubleSide});
+const geometrysPhoto = new THREE.PlaneGeometry(50, 50, 10, 10);
 
 const geometry1 = new THREE.SphereGeometry(5, 64, 64)
 const texture1 = new THREE.TextureLoader().load('https://images.unsplash.com/photo-1557411732-1797a9171fcf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cGF0dGVybiUyMHRleHR1cmV8ZW58MHx8MHx8&w=1000&q=80');
@@ -234,7 +245,7 @@ var addCubeButton = document.createElement( 'button' );
 addCubeButton.innerHTML = 'Add Cube';
 addCubeButton.style.position = 'absolute';
 addCubeButton.style.top = '2%';
-addCubeButton.style.right = '5%';
+addCubeButton.style.left = '5%';
 document.body.appendChild( addCubeButton );
 
 addCubeButton.addEventListener( 'click', function () {
@@ -250,7 +261,7 @@ var addSphereButton = document.createElement( 'button' );
 addSphereButton.innerHTML = 'Add Sphere';
 addSphereButton.style.position = 'absolute';
 addSphereButton.style.top = '6%';
-addSphereButton.style.right = '5%';
+addSphereButton.style.left = '5%';
 document.body.appendChild( addSphereButton );
 
 addSphereButton.addEventListener( 'click', function () {
@@ -259,6 +270,23 @@ addSphereButton.addEventListener( 'click', function () {
     sphere.position.y = 5;
     scene.add( sphere );
     objects.push( sphere );
+} );
+
+//add frame button 
+var addFrameButton = document.createElement( 'button' );
+addFrameButton.innerHTML = 'Add Frame';
+addFrameButton.style.position = 'absolute';
+addFrameButton.style.top = '6%';
+addFrameButton.style.left = '18%';
+document.body.appendChild( addFrameButton );
+
+addFrameButton.addEventListener( 'click', function () {
+    const frame = new THREE.Mesh( geometrysPhoto, materialsPhoto );
+    frame.position.z = -498;
+    frame.position.y = 100;
+    console.log('frame')
+    scene.add( frame );
+    objects.push( frame );
 } );
 
 
@@ -282,7 +310,7 @@ renderer2.setSize( window.innerWidth*0.2, window.innerHeight*0.2 );
 renderer2.domElement.style.zIndex = 5;
 renderer2.domElement.style.position = 'absolute';
 renderer2.domElement.style.top = '12%';
-renderer2.domElement.style.left = '72.5%';
+renderer2.domElement.style.left = '5%';
 document.body.appendChild( renderer2.domElement );
 
 var cube2 = new THREE.Mesh( geometry, material );
