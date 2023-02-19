@@ -1,0 +1,1 @@
+npm i three gsap & npm run dev
