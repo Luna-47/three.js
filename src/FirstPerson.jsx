@@ -14,24 +14,43 @@ const sizes={
 const light = new THREE.PointLight(0xffffff, 1, 1000)
 light.position.set(0, 600, 0) //(x,y,z)
 light.intensity=2
+light.castShadow = true
+light.shadow.mapSize.width = 2048; // increase the shadow map size for better quality
+light.shadow.mapSize.height = 2048;
 scene.add(light)
 const light2 = new THREE.PointLight(0xffffff, 1, 1000)
 light2.position.set(10, 500, 200) //(x,y,z)
 light2.intensity=2
+light2.castShadow = true
+light2.shadow.mapSize.width = 2048; // increase the shadow map size for better quality
+light2.shadow.mapSize.height = 2048;
 scene.add(light2)
 const light3 = new THREE.PointLight(0xffffff, 1, 1000)
 light3.position.set(-200, 600, -10) //(x,y,z)
 light3.intensity=1
+light3.castShadow = true
+light3.shadow.mapSize.width = 2048; // increase the shadow map size for better quality
+light3.shadow.mapSize.height = 2048;
 scene.add(light3)
 const light4 = new THREE.PointLight(0xffffff, 1, 1000)
 light4.position.set(0,0,0) //(x,y,z)
 light4.intensity=1
+light4.castShadow = true
+light4.shadow.mapSize.width = 2048; // increase the shadow map size for better quality
+light4.shadow.mapSize.height = 2048;
 scene.add(light4)
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+ambientLight.castShadow = true
 scene.add(ambientLight)
 
+//textures
+const woodenTexture = 'https://t3.ftcdn.net/jpg/05/03/22/88/360_F_503228811_52rvm1eaIpXxVQ9TaTNV1USeU4rZDR6y.jpg';
+const metallicTexture = 'https://images.freecreatives.com/wp-content/uploads/2016/01/Shiny-Aluminium-Brushed-Metal-Texture.jpg';
+const photoTexture = 'https://www.creativefabrica.com/wp-content/uploads/2022/01/01/Liquid-abstract-texture-wallpaper-Graphics-22739180-1-580x390.jpg';
+
+//camera
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 10, 100);
+camera.position.set(0, 20, 200);
 scene.add(camera)
 
 // Create a renderer
@@ -75,10 +94,11 @@ var selected = false;
 var selectedObject = null;
 var objects = [];
 
-const boxTexture = new THREE.TextureLoader().load('https://t3.ftcdn.net/jpg/05/03/22/88/360_F_503228811_52rvm1eaIpXxVQ9TaTNV1USeU4rZDR6y.jpg');
+const boxTexture = new THREE.TextureLoader().load( woodenTexture );
 var geometry = new THREE.BoxGeometry( 20, 20, 20 );
 var material = new THREE.MeshStandardMaterial( { map:boxTexture } );
 var object = new THREE.Mesh( geometry, material );
+object.castShadow=true;
 object.position.x = 0;
 object.position.y = 10;
 object.position.z = 0;
@@ -88,7 +108,7 @@ objects.push( object );
 //photoFrame
 const photo = new THREE.TextureLoader().load('https://yaffa-cdn.s3.amazonaws.com/yaffadsp/images/dmImage/StandardImage/p3-hd.jpg');
 const materialsPhoto = new THREE.MeshStandardMaterial({map: photo, side: THREE.DoubleSide});
-const geometrysPhoto = new THREE.PlaneGeometry(50, 50, 10, 10);
+const geometrysPhoto = new THREE.PlaneGeometry(50, 50, 1, 1);
 
 const geometry1 = new THREE.SphereGeometry(5, 64, 64)
 const texture1 = new THREE.TextureLoader().load('https://images.unsplash.com/photo-1557411732-1797a9171fcf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cGF0dGVybiUyMHRleHR1cmV8ZW58MHx8MHx8&w=1000&q=80');
@@ -100,6 +120,9 @@ const material1 = new THREE.MeshStandardMaterial({
 const sphere = new THREE.Mesh(geometry1,material1)
 scene.add(sphere)
 
+const controls = new PointerLockControls(camera, canvas);
+controls.unlock();
+
 //add cube button 
 var addCubeButton = document.createElement( 'button' );
 addCubeButton.innerHTML = 'Add Cube';
@@ -110,6 +133,7 @@ document.body.appendChild( addCubeButton );
 
 addCubeButton.addEventListener( 'click', function () {
     var cube = new THREE.Mesh( geometry, material );
+    cube.castShadow = true;
     cube.position.x = 0;
     cube.position.y = 20;
     scene.add( cube );
@@ -126,10 +150,12 @@ document.body.appendChild( addSphereButton );
 
 addSphereButton.addEventListener( 'click', function () {
     var sphere = new THREE.Mesh( geometry1, material );
+    sphere.castShadow = true;
     sphere.position.x = 0;
     sphere.position.y = 5;
     scene.add( sphere );
     objects.push( sphere );
+    controls.lock()
 } );
 
 //add frame button 
@@ -142,13 +168,12 @@ document.body.appendChild( addFrameButton );
 
 addFrameButton.addEventListener( 'click', function () {
     const frame = new THREE.Mesh( geometrysPhoto, materialsPhoto );
+    frame.castShadow = true;
     frame.position.z = -498;
     frame.position.y = 100;
-    console.log('frame')
     scene.add( frame );
     objects.push( frame );
 } );
-
 
 //groundPlane
 function ground(){
@@ -197,8 +222,40 @@ function ground(){
     scene.add(s4Plane)
 }
 
-//FPS from here
-const controls = new PointerLockControls(camera, canvas);
+var xAxis;
+var yAxis;
+var zAxis;
+
+//axis
+function axis(x,y,z){
+  //red X axis
+  xAxis = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,y,z), new THREE.Vector3(window.innerWidth, y, z)]),
+  new THREE.LineBasicMaterial({ color: 0xff0000, linewidth:5 })
+);
+scene.add(xAxis);
+
+//green Y axis
+  yAxis = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,y,z), new THREE.Vector3(x, window.innerHeight, z)]),
+  new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth:5 })
+);
+scene.add(yAxis);
+
+//blue Z axis
+  zAxis = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,y,z), new THREE.Vector3(x, y, 500)]),
+  new THREE.LineBasicMaterial({ color: 0x0000ff, linewidth:5 })
+);
+scene.add(zAxis);
+}
+
+//remove axis
+function removeAxis(){
+  scene.remove(xAxis);
+  scene.remove(yAxis);
+  scene.remove(zAxis);
+}
 
 //object
 function objectMovement(){
@@ -223,12 +280,14 @@ function objectMovement(){
                 message.innerHTML="Object Selected";
                 message.style.opacity = 0.77;
                 document.addEventListener("keydown", onDocumentKeyDown, false);
+                axis(selectedObject.position.x, selectedObject.position.y, selectedObject.position.z);
             }
             else {
                 selected = false;
                 message.innerHTML = "";
                 message.style.opacity=0;
                 document.removeEventListener("keydown", onDocumentKeyDown);
+                removeAxis();
             }
 
             document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -236,21 +295,33 @@ function objectMovement(){
                 var keyCode = event.which;
                 if (keyCode == 37) {
                     selectedObject.position.x -= 0.1;
+                    removeAxis();
+                    axis(selectedObject.position.x, selectedObject.position.y, selectedObject.position.z);
                     message.innerHTML= 'left'
                   } else if (keyCode == 39) {
                     selectedObject.position.x += 0.1;
+                    removeAxis();
+                    axis(selectedObject.position.x, selectedObject.position.y, selectedObject.position.z);
                     message.innerHTML= 'right'
                   } else if (keyCode == 38) {
                     selectedObject.position.y += 0.1;
+                    removeAxis();
+                    axis(selectedObject.position.x, selectedObject.position.y, selectedObject.position.z);
                     message.innerHTML= 'up'
                   } else if (keyCode == 40) {
                     selectedObject.position.y -= 0.1;
+                    removeAxis();
+                    axis(selectedObject.position.x, selectedObject.position.y, selectedObject.position.z);
                     message.innerHTML= 'down'
                   } else if (keyCode == 13) {
                     selectedObject.position.z -= 0.1;
+                    removeAxis();
+                    axis(selectedObject.position.x, selectedObject.position.y, selectedObject.position.z);
                     message.innerHTML= 'backward'
                   } else if (keyCode == 16) {
                     selectedObject.position.z += 0.1;
+                    removeAxis();
+                    axis(selectedObject.position.x, selectedObject.position.y, selectedObject.position.z);
                     message.innerHTML= 'forward'
                   } else if (keyCode == 107) {
                     selectedObject.scale.x +=0.005
@@ -268,16 +339,17 @@ function objectMovement(){
                     selectedObject.rotation.z +=0.005
                   }else if (keyCode == 46){
                     scene.remove(selectedObject)
+                    removeAxis()
                   }
             }
         }
     }
 }
 
-controls.unlock();
 document.addEventListener('click', () => {
   if(controls.isLocked){
     controls.unlock()
+    removeAxis()
     objectMovement();
 
   }
@@ -289,10 +361,7 @@ document.addEventListener('click', () => {
 
 document.addEventListener('mousemove', (event) => {
     if (controls.isLocked) {
-      const movementX = event.movementX || 0;
-      const movementY = event.movementY || 0;
-      controls.rotateLeft(-movementX * 0.05);
-      controls.rotateUp(-movementY * 0.05);
+      removeAxis()
     }
   });
 
@@ -355,6 +424,8 @@ document.addEventListener('keydown', (event) => {
 function animate(){
     requestAnimationFrame(animate);
     keyMovement();
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.render(scene, camera);
 }
 
